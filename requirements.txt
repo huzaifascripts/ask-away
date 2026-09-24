@@ -1,0 +1,4 @@
+flask>=3.0,<4
+requests>=2.31,<3
+python-dotenv>=1.0,<2
+gunicorn>=23,<27  # production server (used online; not needed on Windows)

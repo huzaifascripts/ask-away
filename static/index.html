@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
+<title>Ask Away</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #101E1B;
+    --ink-soft: #17302C;
+    --paper: #E9DAB4;
+    --paper-dim: #C9B98F;
+    --accent: #E3A857;
+    --accent-hover: #EEBB77;
+    --text: #EDEAE0;
+    --text-muted: #8FA39D;
+    --danger: #C1503C;
+    --danger-bg: rgba(193, 80, 60, 0.15);
+    --danger-border: rgba(193, 80, 60, 0.4);
+    --danger-text: #F0C4B8;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    background: var(--ink);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    max-width: 680px;
+    margin: 0 auto;
+    height: 100vh;
+    height: 100dvh; /* accounts for mobile browser toolbars so the layout doesn't jump */
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid rgba(255,255,255,0.06);
+    border-right: 1px solid rgba(255,255,255,0.06);
+    animation: appIn 0.5s var(--ease);
+  }
+  @keyframes appIn {
+    from { opacity: 0; transform: translateY(8px) scale(0.995); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .app { animation: none; }
+  }
+
+  .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .brand-mark {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 7px 0 0 var(--paper-dim);
+    margin-left: 2px;
+  }
+
+  .brand h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.3rem;
+    margin: 0;
+    letter-spacing: 0.01em;
+  }
+
+  .brand p {
+    margin: 2px 0 0;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
+  .reset-btn {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.14);
+    color: var(--text-muted);
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 0.8rem;
+    font-family: inherit;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  }
+  .reset-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .reset-btn:active { transform: scale(0.96); }
+  .reset-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .chat {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .chat::-webkit-scrollbar { width: 8px; }
+  .chat::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+  .empty-state {
+    margin: auto 0;
+    text-align: center;
+    color: var(--text-muted);
+    padding: 0 12px;
+  }
+  .empty-state h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-style: italic;
+    color: var(--text);
+    font-size: 1.4rem;
+    margin: 0 0 4px;
+  }
+  .suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 18px;
+  }
+  .suggestion-chip {
+    background: var(--ink-soft);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text);
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    touch-action: manipulation;
+    font-family: inherit;
+    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  }
+  .suggestion-chip:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .suggestion-chip:active { transform: translateY(0) scale(0.97); }
+  .suggestion-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .message {
+    display: flex;
+    max-width: 85%;
+    animation: rise 0.45s var(--ease);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .message { animation: none; }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* Each word of a reply fades/settles in on its own, one after another, so
+     the answer feels like it's arriving rather than just appearing.
+     animation-delay is set per word from JavaScript. */
+  .word-fade {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(4px);
+    animation: wordIn 0.35s var(--ease) forwards;
+  }
+  @keyframes wordIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .word-fade { animation: none; opacity: 1; transform: none; }
+  }
+
+  .message.user { align-self: flex-end; }
+  .message.assistant,
+  .message.error { align-self: flex-start; }
+  .message.assistant { min-width: 0; } /* lets wide code blocks scroll instead of overflowing */
+
+  .bubble {
+    padding: 12px 16px;
+    border-radius: 14px;
+    line-height: 1.55;
+    font-size: 0.96rem;
+    word-wrap: break-word;
+  }
+
+  .message.user .bubble {
+    background: var(--paper);
+    color: #241C0F;
+    border-bottom-right-radius: 4px;
+  }
+
+  .message.assistant .bubble {
+    background: var(--ink-soft);
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+  }
+
+  .bubble code {
+    font-family: 'SFMono-Regular', Consolas, Menlo, monospace;
+  }
+  .bubble code.inline-code {
+    background: rgba(0,0,0,0.22);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 0.88em;
+  }
+  .message.user .bubble code.inline-code { background: rgba(0,0,0,0.1); }
+
+  /* Fenced ``` code blocks — real models use these a lot. Scrolls sideways
+     instead of stretching the bubble on narrow screens. */
+  .bubble pre {
+    background: rgba(0,0,0,0.28);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin: 8px 0;
+    overflow-x: auto;
+    font-size: 0.86em;
+    line-height: 1.45;
+  }
+  .bubble pre code { white-space: pre; }
+
+  .message.error .bubble {
+    background: var(--danger-bg);
+    border: 1px solid var(--danger-border);
+    color: var(--danger-text);
+    border-bottom-left-radius: 4px;
+  }
+
+  .thinking .bubble {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding: 14px 16px;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 1.1s infinite ease-in-out;
+  }
+  .dot:nth-child(2) { animation-delay: 0.15s; }
+  .dot:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes pulse {
+    0%, 80%, 100% { opacity: 0.25; transform: scale(0.85); }
+    40% { opacity: 1; transform: scale(1); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dot { animation: none; opacity: 0.6; }
+  }
+
+  .composer {
+    display: flex;
+    gap: 10px;
+    padding: 16px 24px calc(22px + env(safe-area-inset-bottom));
+    border-top: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+    align-items: flex-end;
+  }
+
+  textarea#input {
+    flex: 1;
+    resize: none;
+    background: var(--ink-soft);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-family: inherit;
+    font-size: 16px; /* 16px stops iOS Safari from zooming in when this is focused */
+    line-height: 1.4;
+    max-height: 160px;
+    transition: height 0.15s var(--ease), border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  textarea#input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(227, 168, 87, 0.15);
+  }
+  textarea#input::placeholder { color: var(--text-muted); }
+
+  .send-btn {
+    background: var(--accent);
+    border: none;
+    color: #1B140A;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    cursor: pointer;
+    touch-action: manipulation;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
+  }
+  .send-btn:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-1px); }
+  .send-btn:active:not(:disabled) { transform: scale(0.92); }
+  .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .send-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 480px) {
+    .app-header { padding: 16px; }
+    .chat { padding: 16px; }
+    .composer { padding: 12px 16px 16px; }
+    .message { max-width: 92%; }
+  }
+
+    /* Links in replies */
+  .bubble a {
+    color: var(--accent);
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+  }
+  .bubble a:hover { color: var(--accent-hover); }
+  .bubble a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+  .bubble a .word-fade { text-decoration: inherit; }
+
+</style>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <div>
+          <h1>Ask Away</h1>
+          <p>Managed By Huzaifa Scripts</p>
+        </div>
+      </div>
+      <button class="reset-btn" id="resetBtn" type="button">New chat</button>
+    </header>
+
+    <main class="chat" id="chat" aria-live="polite">
+      <div class="empty-state" id="emptyState">
+        <h2>Ask me anything</h2>
+        <div class="suggestions">
+          <button class="suggestion-chip" type="button">What can you do?</button>
+          <button class="suggestion-chip" type="button">About Huzaifa Scripts</button>
+          <button class="suggestion-chip" type="button">How can you help me?</button>
+        </div>
+      </div>
+    </main>
+
+    <form class="composer" id="composer">
+      <textarea id="input" rows="1" maxlength="4000" placeholder="Message the assistant..." aria-label="Message" autofocus></textarea>
+      <button class="send-btn" id="sendBtn" type="submit" aria-label="Send message">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 12L20 4L14 20L11 13L4 12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+
+<script>
+(function () {
+  // Grab references to the elements we need to work with.
+  var chat = document.getElementById('chat');
+  var composer = document.getElementById('composer');
+  var input = document.getElementById('input');
+  var sendBtn = document.getElementById('sendBtn');
+  var resetBtn = document.getElementById('resetBtn');
+
+  var isWaiting = false;
+
+  // The whole conversation so far, in the format the API expects:
+  // [{ role: 'user' | 'assistant', content: '...' }, ...]
+  // The model has no memory of its own — it only "remembers" earlier messages
+  // because we send this full list with every request.
+  var history = [];
+
+  // Lets "New chat" cancel a request that's still waiting for a reply, so an
+  // old answer can't land in the fresh conversation.
+  var activeRequest = null;
+
+  // --- Small helpers for turning text into safe HTML ---
+
+  // Always escape FIRST. Model output is untrusted text; escaping before adding
+  // our own tags means a reply containing <script> shows up as text, not code.
+  function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // A deliberately tiny Markdown subset: ``` code blocks, `inline code`,
+  // **bold**, and line breaks. Enough for most chat replies.
+  function renderMarkdown(raw) {
+    var text = escapeHtml(raw.replace(/\u0000/g, ''));
+
+    // Pull code blocks out first (swapped for placeholders) so the inline
+    // rules below can't mangle what's inside them.
+    var blocks = [];
+    text = text.replace(/```[^\n]*\n([\s\S]*?)```/g, function (_, code) {
+      blocks.push('<pre><code>' + code.replace(/\n$/, '') + '</code></pre>');
+      return '\u0000' + (blocks.length - 1) + '\u0000';
+    });
+
+    text = text.replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>');
+    text = text.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+    
+    // Turns links and email addresses into clickable links. Handles:
+    //   [name](https://...)        -> shows "name", opens in a new tab
+    //   [name](mailto:you@x.com)   -> shows "name", opens the email app
+    //   https://...                -> shows the address without "https://"
+    //   you@example.com            -> opens the email app
+    // Only https/http/mailto links are allowed, and quotes/brackets can't be
+    // part of a link, so a reply can't sneak extra HTML into the page.
+    function makeLink(url, label) {
+      // Web links open in a new tab; email links open the email app instead.
+      var newTab = url.indexOf('mailto:') === 0 ? '' : ' target="_blank" rel="noopener noreferrer"';
+      return '<a href="' + url + '"' + newTab + '>' + label + '</a>';
+    }
+    text = text.replace(
+      /\[([^\]\n]+)\]\(((?:https?:\/\/|mailto:)[^\s)"'<>]+)\)|(https?:\/\/[^\s)"'<>]+)|([\w.+-]+@[\w-]+(?:\.[\w-]+)+)/g,
+      function (match, name, url, bareUrl, email) {
+        if (name) return makeLink(url, name);
+        if (email) return makeLink('mailto:' + email, email);
+        // Leave sentence punctuation like "." or "," outside the link.
+        var trailing = (bareUrl.match(/(?:[.,!?;:]|&gt;|&lt;)+$/) || [''])[0];
+        var cleanUrl = bareUrl.slice(0, bareUrl.length - trailing.length);
+        var label = cleanUrl.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+        return makeLink(cleanUrl, label) + trailing;
+      }
+    );
+
+    text = text.replace(/\n?(\u0000\d+\u0000)\n?/g, '$1'); // no stray blank lines around blocks
+    text = text.replace(/\n/g, '<br>');
+    text = text.replace(/\u0000(\d+)\u0000/g, function (_, i) { return blocks[Number(i)]; });
+    return text;
+  }
+
+  function scrollToBottom() {
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function clearEmptyState() {
+    var el = document.getElementById('emptyState');
+    if (el) el.remove();
+  }
+
+  function buildEmptyState() {
+    var div = document.createElement('div');
+    div.className = 'empty-state';
+    div.id = 'emptyState';
+    div.innerHTML =
+      '<h2>Ask me anything</h2>' +
+      '<div class="suggestions">' +
+      '<button class="suggestion-chip" type="button">What can you do?</button>' +
+      '<button class="suggestion-chip" type="button">About Huzaifa Scripts</button>' +
+      '<button class="suggestion-chip" type="button">How can you help me?</button>' +
+      '</div>';
+    div.querySelectorAll('.suggestion-chip').forEach(function (chip) {
+      chip.addEventListener('click', function () { handleSend(chip.textContent); });
+    });
+    return div;
+  }
+
+  function addMessage(role, text) {
+    clearEmptyState();
+    var wrapper = document.createElement('div');
+    wrapper.className = 'message ' + role;
+    if (role === 'error') wrapper.setAttribute('role', 'alert'); // announced by screen readers
+    var bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerHTML = renderMarkdown(text);
+    wrapper.appendChild(bubble);
+    chat.appendChild(wrapper);
+    if (role === 'assistant') animateWords(bubble);
+    scrollToBottom();
+  }
+
+  // Wraps every word in the bubble in its own <span>, then gives each one an
+  // increasing animation-delay so the reply appears to "type" itself in.
+  function animateWords(bubble) {
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return;
+
+    var walker = document.createTreeWalker(bubble, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (node) {
+        return (node.parentElement && node.parentElement.closest('code'))
+          ? NodeFilter.FILTER_REJECT
+          : NodeFilter.FILTER_ACCEPT;
+      }
+    });
+
+    var textNodes = [];
+    var node;
+    while ((node = walker.nextNode())) textNodes.push(node);
+
+    var wordIndex = 0;
+    textNodes.forEach(function (textNode) {
+      var parts = textNode.textContent.split(/(\s+)/);
+      var frag = document.createDocumentFragment();
+      parts.forEach(function (part) {
+        if (part === '') return;
+        if (/^\s+$/.test(part)) {
+          frag.appendChild(document.createTextNode(part));
+        } else {
+          var span = document.createElement('span');
+          span.className = 'word-fade';
+          span.textContent = part;
+          span.style.animationDelay = Math.min(wordIndex * 15, 900) + 'ms';
+          wordIndex++;
+          frag.appendChild(span);
+        }
+      });
+      textNode.parentNode.replaceChild(frag, textNode);
+    });
+  }
+
+  function showThinking() {
+    var wrapper = document.createElement('div');
+    wrapper.className = 'message assistant thinking';
+    wrapper.id = 'thinkingIndicator';
+    wrapper.setAttribute('role', 'status');
+    wrapper.setAttribute('aria-label', 'Assistant is typing');
+    wrapper.innerHTML = '<div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
+    chat.appendChild(wrapper);
+    scrollToBottom();
+  }
+
+  function hideThinking() {
+    var el = document.getElementById('thinkingIndicator');
+    if (!el) return;
+    el.style.transition = 'opacity 0.15s ease';
+    el.style.opacity = '0';
+    setTimeout(function () { el.remove(); }, 150);
+  }
+
+    function autoSize() {
+    input.style.height = 'auto';
+    // scrollHeight doesn't include the border, but the height we set does
+    // (box-sizing: border-box), so add the border back or a scrollbar appears.
+    var border = input.offsetHeight - input.clientHeight;
+    input.style.height = Math.min(input.scrollHeight + border, 160) + 'px';
+  }
+
+  // Creates an empty assistant bubble that the streamed words get written into.
+  function startAssistantMessage() {
+    clearEmptyState();
+    var wrapper = document.createElement('div');
+    wrapper.className = 'message assistant';
+    var bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    wrapper.appendChild(bubble);
+    chat.appendChild(wrapper);
+    return bubble;
+  }
+
+  // Sends the conversation to OUR server (app.py), never straight to
+  // OpenRouter — the API key only exists on the server. The reply arrives
+  // in pieces (one JSON object per line) and is shown as it comes in.
+  async function respond() {
+    isWaiting = true;
+    sendBtn.disabled = true;
+    showThinking();
+    chat.setAttribute('aria-busy', 'true'); // screen readers wait until the reply is complete
+
+    var controller = new AbortController();
+    activeRequest = controller;
+    var bubble = null;   // created when the first words arrive
+    var replyText = '';
+
+    try {
+      var res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: history }),
+        signal: controller.signal
+      });
+
+      // Errors before the answer starts come back as normal JSON.
+      if (!res.ok || !res.body) {
+        var data = await res.json().catch(function () { return {}; });
+        throw new Error(data.error || 'Something went wrong (HTTP ' + res.status + '). Try again.');
+      }
+
+      var reader = res.body.getReader();
+      var decoder = new TextDecoder();
+      var buffered = '';
+
+      while (true) {
+        var chunk = await reader.read();
+        if (chunk.done) break;
+        buffered += decoder.decode(chunk.value, { stream: true });
+
+        // Each complete line is one piece of the answer. The last part may be
+        // half a line, so keep it until the rest arrives.
+        var lines = buffered.split('\n');
+        buffered = lines.pop();
+
+        for (var i = 0; i < lines.length; i++) {
+          if (!lines[i].trim()) continue;
+          var event;
+          try { event = JSON.parse(lines[i]); } catch (e) { continue; }
+          if (event.error) throw new Error(event.error);
+          if (!event.text) continue;
+
+          // Only auto-scroll if the user hasn't scrolled up to read something.
+          var nearBottom = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 80;
+          replyText += event.text;
+          if (!bubble) {
+            hideThinking();
+            bubble = startAssistantMessage();
+          }
+          bubble.innerHTML = renderMarkdown(replyText);
+          if (nearBottom) scrollToBottom();
+        }
+      }
+
+      if (!replyText.trim()) throw new Error('The model sent back an empty reply. Try sending again.');
+      history.push({ role: 'assistant', content: replyText });
+    } catch (err) {
+      if (err.name === 'AbortError') return; // "New chat" cancelled it on purpose
+
+      // Drop the unanswered question from history so the next send doesn't
+      // include two user messages in a row. It stays visible on screen.
+      history.pop();
+      hideThinking();
+
+      // fetch() throws a TypeError when the server can't be reached at all.
+            var isLocal = location.hostname === '127.0.0.1' || location.hostname === 'localhost';
+      var message = err instanceof TypeError
+        ? (isLocal
+            ? "Couldn't reach the server. Make sure app.py is running and you opened http://127.0.0.1:5000."
+            : "Couldn't reach the server. Check your internet connection and try again.")
+        : err.message;
+      addMessage('error', message);
+    } finally {
+      chat.removeAttribute('aria-busy');
+      // Only reset if this request is still the current one (not replaced by "New chat").
+      if (activeRequest === controller) {
+        activeRequest = null;
+        isWaiting = false;
+        sendBtn.disabled = false;
+      }
+    }
+  }
+
+  function handleSend(text) {
+    var trimmed = (text || '').trim();
+    if (!trimmed || isWaiting) return;
+    addMessage('user', trimmed);
+    history.push({ role: 'user', content: trimmed });
+    input.value = '';
+    autoSize();
+    respond();
+  }
+
+  // --- Wiring up events ---
+
+  composer.addEventListener('submit', function (e) {
+    e.preventDefault();
+    handleSend(input.value);
+  });
+
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend(input.value);
+    }
+  });
+
+  input.addEventListener('input', autoSize);
+
+  document.querySelectorAll('.suggestion-chip').forEach(function (chip) {
+    chip.addEventListener('click', function () { handleSend(chip.textContent); });
+  });
+
+  resetBtn.addEventListener('click', function () {
+    if (activeRequest) activeRequest.abort();
+    activeRequest = null;
+    history = [];
+    isWaiting = false;
+    sendBtn.disabled = false;
+    chat.innerHTML = '';
+    chat.appendChild(buildEmptyState());
+    input.focus();
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+ABOUT HUZAIFA
+- Full name: Huzaifa Khan
+- A-Level student and junior web developer
+- Learns in public and builds practical skills through real projects
+- Enjoys the space where thoughtful design meets clear code
+- Currently exploring React, Python, AI, and automation
+- Headline: Junior Web Developer | React & Python | AI & Agentic AI
+
+SKILLS
+- HTML, CSS, JavaScript (prefers plain HTML/CSS/JS without frameworks)
+- Python, including building web backends with Flask
+- Currently learning: React, AI, and automation
+
+PROJECTS
+1. Huzaifa Scripts (https://huzaifascripts.dev/)
+   - His personal blog: a journal about web development, AI, and the craft of building on the web
+   - Topics: web development, JavaScript, and learning in public
+
+2. NexGen Computers website
+   - An e-commerce website for NexGen Computers, a technology retailer in Muscat, Oman
+   - Built with plain HTML, CSS, and JavaScript
+   - Features: product filtering, cart and wishlist, WhatsApp ordering, dark/light theme, and English/Arabic language switching
+
+3. Ask Away (this assistant)
+   - An AI chat assistant built with HTML, CSS, and JavaScript on the front end and Python (Flask) on the back end
+
+WORK
+- Builds websites for clients and personal projects
+
+CONTACT
+- Email: huzaifascripts@gmail.com
+- LinkedIn: [Huzaifa Khan](https://www.linkedin.com/in/huzaifa-khan-141217321/)
+- Instagram: [huzaifakhanhq](https://www.instagram.com/huzaifakhanhq/)
+- YouTube: [huzaifakhanhq](https://youtube.com/@huzaifakhanhq)
