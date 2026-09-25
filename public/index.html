@@ -402,6 +402,15 @@
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
+    // Some AI models put invisible or thin "space" characters inside words
+  // (e.g. "Hu<U+202F>zaifa" shows as "Hu zaifa"). Remove them between letters or
+  // digits, and turn any others into normal spaces.
+  function cleanModelText(text) {
+    return text
+      .replace(/(?<=[\p{L}\p{N}])[\u200B\u2009\u200A\u202F](?=[\p{L}\p{N}])/gu, '')
+      .replace(/[\u2009\u200A\u202F]/g, ' ');
+  }
+
   // A deliberately tiny Markdown subset: ``` code blocks, `inline code`,
   // **bold**, and line breaks. Enough for most chat replies.
   function renderMarkdown(raw) {
@@ -547,7 +556,7 @@
     setTimeout(function () { el.remove(); }, 150);
   }
 
-    function autoSize() {
+    function autoSize() {  // A deliberately tiny Markdown subset
     input.style.height = 'auto';
     // scrollHeight doesn't include the border, but the height we set does
     // (box-sizing: border-box), so add the border back or a scrollbar appears.
@@ -623,13 +632,13 @@
             hideThinking();
             bubble = startAssistantMessage();
           }
-          bubble.innerHTML = renderMarkdown(replyText);
+          bubble.innerHTML = renderMarkdown(cleanModelText(replyText));
           if (nearBottom) scrollToBottom();
         }
       }
 
       if (!replyText.trim()) throw new Error('The model sent back an empty reply. Try sending again.');
-      history.push({ role: 'assistant', content: replyText });
+      history.push({ role: 'assistant', content: cleanModelText(replyText) });
     } catch (err) {
       if (err.name === 'AbortError') return; // "New chat" cancelled it on purpose
 

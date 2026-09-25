@@ -90,7 +90,7 @@ RATE_LIMIT_WINDOW_SECONDS = 3600  # ...per hour
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 log = logging.getLogger("ask-away")
 
-app = Flask(__name__, static_folder="static", static_url_path="/static")
+app = Flask(__name__, static_folder="public", static_url_path="/static")
 app.config["MAX_CONTENT_LENGTH"] = 256 * 1024  # reject absurdly large request bodies
 # Online hosts pass requests through their own proxy servers first. ProxyFix lets
 # request.remote_addr be the visitor's real IP instead of the proxy's.
